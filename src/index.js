@@ -5,30 +5,29 @@ const app = express();
 
 // localhost:3333
 
-app.get("/courses", (req, res) => {
-    return res.json(["Curso 1", "Curso 2", "Curso 3"]);
-/* 
-    na maioria das vezes não iremos utilizar o método "send"
-    e sim o método "json"
-*/
-    
+app.get("/courses", (request, response) => {
+    const query = request.query;
+    console.log(query);
+    return response.json(["Curso 1", "Curso 2", "Curso 3"]);
 });
 
-app.post("/courses",(req,res) => {
-    return res.json(["Curso 1", "Curso 2", "Curso 3", "Curso 4"]);
+app.post("/courses",(request,response) => {
+    return response.json(["Curso 1", "Curso 2", "Curso 3", "Curso 4"]);
 }
 )
 
-app.put("/courses/:id", (req,res)=>{
-    return res.json(["Curso 6", "Curso 2", "Curso 3", "Curso 4"])
+app.put("/courses/:id", (request,response)=>{
+    const {id} = request.params;
+    console.log(id);
+    return response.json(["Curso 6", "Curso 2", "Curso 3", "Curso 4"])
 })
 
-app.patch("/courses/:id", (req,res)=> {
-    return res.json(["Curso 6", "Curso 7", "Curso 3", "Curso 4"])
+app.patch("/courses/:id", (request,response)=> {
+    return response.json(["Curso 6", "Curso 7", "Curso 3", "Curso 4"])
 })
 
-app.delete("/courses/:id", (req,res) => {
-    return res.json(["Curso 6", "Curso 7", "Curso 4"])
+app.delete("/courses/:id", (request,response) => {
+    return response.json(["Curso 6", "Curso 7", "Curso 4"])
 })
 
 app.listen(3333);
