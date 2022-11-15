@@ -10,10 +10,11 @@ app.use(express.json());//midware possibilitando esperar um json
 
 // localhost:3333
 
-app.get("/courses", (request, response) => {
-    const query = request.query;
-    console.log(query);
-    return response.json(["Curso 1", "Curso 2", "Curso 3"]);
+//extrato bancário "statement"
+app.get("/statement/:cpf", (request, response) => {
+    const {cpf} = request.params;
+    const customer = customers.find(customer => customer.cpf === cpf);
+    return response.json(customer.statement);
 });
 
 app.post("/account", (request, response)=>{
