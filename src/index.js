@@ -72,18 +72,4 @@ app.get("/statement/", verifyIfExistsAccountCPF, (request, response) => {
     return response.json(customer.statement);
 });
 
-app.put("/courses/:id", (request,response)=>{
-    const {id} = request.params;
-    console.log(id);
-    return response.json(["Curso 6", "Curso 2", "Curso 3", "Curso 4"])
-})
-
-app.patch("/courses/:id", (request,response)=> {
-    return response.json(["Curso 6", "Curso 7", "Curso 3", "Curso 4"])
-})
-
-app.delete("/courses/:id", (request,response) => {
-    return response.json(["Curso 6", "Curso 7", "Curso 4"])
-})
-
 app.listen(3333);
