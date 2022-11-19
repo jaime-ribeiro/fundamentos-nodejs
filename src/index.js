@@ -9,6 +9,7 @@ app.use(express.json());//midware possibilitando esperar um json
 
 const customers = [];
 
+// middleware
 function verifyIfExistsAccountCPF(request, response, next) {
     const {cpf} = request.headers;
 
@@ -21,6 +22,19 @@ function verifyIfExistsAccountCPF(request, response, next) {
     request.customer = customer;
 
     return next();
+}
+
+function getBalance(statement){
+    const balance = statement.reduce((acc, operation)=>{
+        if( operation.type==='credit'){
+            return acc + operation.amount;
+        }
+        else{
+            return acc - operation.amount;
+        }
+    }, 0);
+
+    return balance;
 }
 
 app.post("/account", (request, response)=>{
@@ -45,6 +59,16 @@ app.post("/account", (request, response)=>{
     //returnando o status code 201 que confirma que deu tudo certo
 });
 
+//app.use(verifyIfExistsAccountCPF);
+
+//extrato bancário "statement"
+//Middleware utilizado após o nome da rota
+app.get("/statement/", verifyIfExistsAccountCPF, (request, response) => {
+    //fazendo a desestruturação do request criado dentro do middleware
+    const {customer} = request;
+    return response.json(customer.statement);
+});
+
 app.post("/deposit", verifyIfExistsAccountCPF, (request, response) =>{
     const {description, amount} = request.body;
     
@@ -62,14 +86,25 @@ app.post("/deposit", verifyIfExistsAccountCPF, (request, response) =>{
     return response.status(201).send();
 });
 
-app.use(verifyIfExistsAccountCPF);
+app.post("/withdraw", verifyIfExistsAccountCPF, (request,response) =>{
+    const { amount } = request.body;
+    const { customer} = request;
 
-//extrato bancário "statement"
-//Middleware utilizado após o nome da rota
-app.get("/statement/", verifyIfExistsAccountCPF, (request, response) => {
-    //fazendo a desestruturação do request criado dentro do middleware
-    const {customer} = request;
-    return response.json(customer.statement);
+    const balance = getBalance(customer.statement);
+
+    if(balance < amount){
+        return response.status(400).json({error: "Insufficient funds"});
+    }
+
+    const statementOperation = {
+        amount,
+        created_at: new Date(),
+        type: "debit",
+    };
+
+    customer.statement.push(statementOperation);
+
+    return response.status(201).send();
 });
 
 app.listen(3333);
