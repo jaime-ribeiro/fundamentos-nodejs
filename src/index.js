@@ -110,16 +110,47 @@ app.post("/withdraw", verifyIfExistsAccountCPF, (request,response) =>{
 app.get("/statement/date", verifyIfExistsAccountCPF, (request, response) => {
     const {customer} = request;
     const {date} = request.query;
-
-    const dateFormate = new Date( date + "00:00");
-
+    //Quando se põe a data junto da string 00:00 sem o espaço antes ocorre um erro e diz que a data é inválida.
+    const dateFormate = new Date(date + " 00:00");
+    console.log(dateFormate);
     const statement = customer.statement.filter(
         (statement)=>
         statement.created_at.toDateString() ===
         new Date(dateFormate).toDateString()
         );
-
+    console.log(statement);
     return response.json(statement);
+});
+
+app.put("/account", verifyIfExistsAccountCPF, (request, response) => {
+    const {customer} = request;
+    const {name} = request.body;
+
+    customer.name = name; 
+
+    return response.status(201).send();
+});
+
+app.get("/account", verifyIfExistsAccountCPF, (request, response) => {
+    const {customer} = request;
+
+    return response.json(customer);
+});
+
+app.delete("/account", verifyIfExistsAccountCPF, (request, response)=> {
+    const {customer} = request;
+//Splice apagando somente o último cusomter criado -incompleto-
+    customers.splice(customer, 1);
+
+    return response.status(200).json(customers)
+});
+
+app.get("/balance", verifyIfExistsAccountCPF, (request, response) =>{
+ const {customer} = request;
+ const balance = getBalance(customer.statement);
+
+ return response.status(200).json(balance);
+
 });
 
 app.listen(3333);
